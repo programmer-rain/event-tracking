@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: track-demo-backend
+  profiles:
+    # 教学 Demo 默认 local 模式：零外部依赖，全内存链路，开箱即跑
+    # 体验完整架构时切换：--spring.profiles.active=full（需先 docker compose up -d）
+    active: local
+  jackson:
+    default-property-inclusion: non_null
+
+track:
+  kafka:
+    topic: track_events
+  ingest:
+    queue-capacity: 50000        # 有界队列容量（local 模式），满了触发背压丢弃
+    batch-size: 500              # 消费端攒批大小
+    flush-ms: 500                # 攒批最长等待时间
+    max-batch-per-request: 100   # 单次上报最多条数，防恶意超大包
+    qps-limit: 200               # 单 IP 每秒限流阈值
+    clock-skew-minutes: 10       # 客户端时钟偏差容忍上限（分钟），超过直接丢弃
+
+logging:
+  level:
+    com.demo.track: info
